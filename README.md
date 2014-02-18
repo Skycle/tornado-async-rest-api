@@ -1,4 +1,17 @@
-tornado-async-rest-api
-======================
+# WHAT
+A api server demo based on tornado,motor,pyrestful.
 
-a demo based on pyrestful+motor+tornado
+# TODO
+- refer python-rest-handler
+  - how the rest urls get parsed 
+  - type check 
+  - authority
+
+- refer douban api
+
+- ...
+
+# DONE
+- 2014.02.18 error handling，refer [d3status][1] for the view of api error(api server should not give errr status code,but just 200)
+
+[1]: https://github.com/felinx/d3status
