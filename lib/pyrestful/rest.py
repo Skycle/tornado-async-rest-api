@@ -138,6 +138,7 @@ class RestHandler(tornado.web.RequestHandler):
             # FIXME 为了兼容motor的异步调用逻辑，这里hack了部分pyrestful的代码
             if operation._method == self.request.method and service_name == services_from_request and len(service_params) + len(service_name) == len(services_and_params):
                 try:
+                    # 参数的映射关系非常粗暴，基本就是按照顺序一个一个对应起来...囧
                     params_values = self._find_params_value_of_url(service_name,request_path) + self._find_params_value_of_arguments(operation)
                     p_values      = self._convert_params_values(params_values, params_types)
                     response      = operation(*p_values)
