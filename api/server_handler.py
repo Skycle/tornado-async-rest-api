@@ -21,11 +21,13 @@ class ServerResource(BaseHandler):
 
         data = self.check_args()
 
-        if not data.get("servers", None) or not isinstance(data["servers"], list):
+        # FIXME unicode error
+        # if not data.get("server", None) or not isinstance(data["server"], str):
+        if not data.get("server", None) :
             self._gen_response(status_txt='bad arg data', log_message='track args bad arg data.')
             return
 
-        result = yield self.db.add_server(server_list=data["servers"])
+        result = yield self.db.add_server(server_id=data["server"])
 
         self.write(tornado.escape.json_encode(result))
         self.finish()

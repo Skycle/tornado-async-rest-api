@@ -1,4 +1,4 @@
-Q1账号系统接口说明
+q1账号系统接口说明
 =============
 
 # version
@@ -10,10 +10,10 @@ Q1账号系统接口说明
     - POST
         - url: '/servers'
         - format: json
-        - request: {"servers":['127.0.0.1:80']}
+        - request: {"server":'127.0.0.1:80'}
         - response:
-            - success: HTTP 200
-            - fail:    {"status_code": 400, "status_txt": "create server failed, duplicate server."}
+            - success:  {"id":2}
+            - fail:     {"status_code": 400, "status_txt": "create server failed, duplicate server."}
 
     - GET
        - url: '/servers'
@@ -35,9 +35,9 @@ Q1账号系统接口说明
     - POST
         - url:  '/users'
         - format: json
-        - request: {'uid':'12312312312312'}
+        - request: {'uid':'12312312312312', 'pwd':'2318231231'}
         - response:
-            - success: {"status_code": 200, "result": {"token": "kBZ6b4osZf2ens9Aa1PKDZozpVWkROD97q4leV4rMdw"}, "status_txt": "OK"}
+            - success: {"token": "kBZ6b4osZf2ens9Aa1PKDZozpVWkROD97q4leV4rMdw"}
             - fail:    {"status_code": 500, "status_txt": "create user failed, duplicate user."}
     - GET
     - PUT/PATCH

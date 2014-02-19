@@ -19,13 +19,36 @@ class Mongodb(object):
         self.db = connection[MONGO_SETTINGS['mongo']['db']]
         self.log = log
 
-    #TODO better dup server error solutions
+    # #TODO better dup server error solutions
+    # @tornado.gen.coroutine
+    # def add_server(self, server_list=None) :
+    #     result = {}
+    #     try:
+    #         # TODO for duplicate error
+    #         yield motor.Op(self.db["server"].insert, [{'address': server} for server in server_list])
+    #     except pymongo.errors.DuplicateKeyError:
+    #         self.log.error('create server failed, duplicate server.')
+    #         result.update({
+    #             'status_code': 400,  # TODO better code?
+    #             'status_txt': 'create server failed, duplicate server.'})
+    #         raise tornado.gen.Return(result)
+
+    #     raise tornado.gen.Return({})
+
     @tornado.gen.coroutine
-    def add_server(self, server_list=None) :
+    def add_server(self, server_id=None) :
         result = {}
         try:
-            # TODO for duplicate error
-            yield motor.Op(self.db["server"].insert, [{'address': server} for server in server_list])
+            # FIXME can't be called on paral
+            server_id_info = yield motor.Op(self.db["helpers"].find_and_modify,
+                                       query={"server_id_current":{"$gt":0}},
+                                       update={'$inc': {'server_id_current': 1}},
+                                       # sort={'_id': pymongo.ASCENDING},
+                                   )
+            yield motor.Op(self.db["server"].insert, {'address': server_id, 'id': server_id_info["server_id_current"]})
+
+            raise tornado.gen.Return({'id': int(server_id_info['server_id_current'])})
+
         except pymongo.errors.DuplicateKeyError:
             self.log.error('create server failed, duplicate server.')
             result.update({
@@ -33,14 +56,15 @@ class Mongodb(object):
                 'status_txt': 'create server failed, duplicate server.'})
             raise tornado.gen.Return(result)
 
-        raise tornado.gen.Return({})
-
     @tornado.gen.coroutine
     def del_server(self, server_list=None) :
 
+        result = {}
+
         try:
-            result = yield motor.Op(self.db["server"].remove,
-                                {'address': {'$in': server_list}})
+            for server in server_list:
+                result = yield motor.Op(self.db["server"].remove,
+                                        {'id': int(server)})
         except Exception, e:
             err_msg= 'serious error: %s' % e
             self.log.error(err_msg)
@@ -49,7 +73,7 @@ class Mongodb(object):
                 'status_txt': 'error unkown.may try latter'})
             raise tornado.gen.Return(result)
 
-        raise tornado.gen.Return({})
+        raise tornado.gen.Return(None)
 
     @tornado.gen.coroutine
     def add_user(self, uid=None) :
