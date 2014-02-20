@@ -53,9 +53,6 @@ class UserResource(BaseHandler):
             return
 
         result = yield self.db.login_user(uid=data["uid"], pwd=None)
-        if not result.get('status_code', None):
-            result['status_code'] = 200
-            result['status_txt'] = 'OK'
 
         self.write(tornado.escape.json_encode(result))
         self.finish()

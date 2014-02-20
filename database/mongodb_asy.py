@@ -100,7 +100,7 @@ class Mongodb(object):
                 'status_txt': 'error unkown.may try latter'})
             raise tornado.gen.Return(result)
 
-        raise tornado.gen.Return({'result':{'token':token}})
+        raise tornado.gen.Return({'token':token})
 
     @tornado.gen.coroutine
     def login_user(self, uid=None, pwd=None) :
@@ -114,13 +114,6 @@ class Mongodb(object):
                            {"$set":{'token': token}},
                            upsert=True
             )
-        except pymongo.errors.DuplicateKeyError:
-            err_msg = 'create user failed, duplicate user.'
-            self.log.error(err_msg)
-            result.update({
-                'status_code': 400,
-                'status_txt': err_msg})
-            raise tornado.gen.Return(result)
         except Exception, e:
             err_msg= 'serious error: %s' % e
             self.log.error(err_msg)
@@ -129,7 +122,7 @@ class Mongodb(object):
                 'status_txt': 'error unkown.may try latter'})
             raise tornado.gen.Return(result)
 
-        raise tornado.gen.Return({'result':{'token':token}})
+        raise tornado.gen.Return({'token':token})
 
 
     @tornado.gen.coroutine

@@ -39,6 +39,13 @@ q1账号系统接口说明
         - response:
             - success: {"token": "kBZ6b4osZf2ens9Aa1PKDZozpVWkROD97q4leV4rMdw"}
             - fail:    {"status_code": 500, "status_txt": "create user failed, duplicate user."}
+    - POST 
+        - url: '/users/login'
+        - format: json
+        - request: {'uid':'12312312312312', 'pwd':'2318231231'}
+        - response:
+            - success: {"token": "kBZ6b4osZf2ens9Aa1PKDZozpVWkROD97q4leV4rMdw"}
+            - fail:    {"status_code": 500, "status_txt": "error unkown.may try later"}
     - GET
     - PUT/PATCH
     - DELETE
