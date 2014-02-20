@@ -27,7 +27,7 @@ class ServerResource(BaseHandler):
             self._gen_response(status_txt='bad arg data', log_message='track args bad arg data.')
             return
 
-        result = yield self.db.add_server(server_id=data["server"])
+        result = yield self.db.add_server(address=data["server"])
 
         self.write(tornado.escape.json_encode(result))
         self.finish()

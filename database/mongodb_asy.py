@@ -36,7 +36,7 @@ class Mongodb(object):
     #     raise tornado.gen.Return({})
 
     @tornado.gen.coroutine
-    def add_server(self, server_id=None) :
+    def add_server(self, address=None) :
         result = {}
         try:
             # FIXME can't be called on paral
@@ -45,7 +45,8 @@ class Mongodb(object):
                                        update={'$inc': {'server_id_current': 1}},
                                        # sort={'_id': pymongo.ASCENDING},
                                    )
-            yield motor.Op(self.db["server"].insert, {'address': server_id, 'id': server_id_info["server_id_current"]})
+            # yield motor.Op(self.db["server"].insert, {'address': server_id, 'id': server_id_info["server_id_current"]})
+            yield motor.Op(self.db["server"].update, {'address':address }, {"$set":{'id':server_id_info["server_id_current"], "address": address}},upsert=True)
 
             raise tornado.gen.Return({'id': int(server_id_info['server_id_current'])})
 
@@ -100,6 +101,36 @@ class Mongodb(object):
             raise tornado.gen.Return(result)
 
         raise tornado.gen.Return({'result':{'token':token}})
+
+    @tornado.gen.coroutine
+    def login_user(self, uid=None, pwd=None) :
+        result = {}
+        token = base64.b64encode(hashlib.sha256( str(random.getrandbits(256)) ).digest(), random.choice(['rA','aZ','gQ','hH','hG','aR','DD'])).rstrip('==')
+
+        # TODO more error situation hanled
+        try:
+            yield motor.Op(self.db["user"].update,
+                           {'_id': uid},
+                           {"$set":{'token': token}},
+                           upsert=True
+            )
+        except pymongo.errors.DuplicateKeyError:
+            err_msg = 'create user failed, duplicate user.'
+            self.log.error(err_msg)
+            result.update({
+                'status_code': 400,
+                'status_txt': err_msg})
+            raise tornado.gen.Return(result)
+        except Exception, e:
+            err_msg= 'serious error: %s' % e
+            self.log.error(err_msg)
+            result.update({
+                'status_code': 400,
+                'status_txt': 'error unkown.may try latter'})
+            raise tornado.gen.Return(result)
+
+        raise tornado.gen.Return({'result':{'token':token}})
+
 
     @tornado.gen.coroutine
     def del_user(self, uid=None) :
